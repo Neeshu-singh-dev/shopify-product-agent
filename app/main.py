@@ -140,17 +140,17 @@ class App:
         self.button.config(state="normal")
         self.progress["value"] = 100
         self.status.set(
-            f"Complete — {summary["images_found"]} found, {summary["failed"]} failed"
+            f"Complete — {summary['images_found']} found, {summary['failed']} failed"
         )
         saved_mb = summary["saved_bytes"] / (1024 * 1024)
         messagebox.showinfo(
             "Optimization complete",
             f"Finished.\n\n"
-            f"Images found: {summary["images_found"]}\n"
-            f"Converted: {summary["converted"]}\n"
-            f"GIF unchanged: {summary["gif_unchanged"]}\n"
-            f"WebP optimized: {summary["webp_optimized"]}\n"
-            f"Failed: {summary["failed"]}\n\n"
+            f"Images found: {summary['images_found']}\n"
+            f"Converted: {summary['converted']}\n"
+            f"GIF unchanged: {summary['gif_unchanged']}\n"
+            f"WebP optimized: {summary['webp_optimized']}\n"
+            f"Failed: {summary['failed']}\n\n"
             f"Original size: {summary["original_bytes"] / (1024 * 1024):.1f} MB\n"
             f"Optimized size: {summary["output_bytes"] / (1024 * 1024):.1f} MB\n"
             f"Space saved: {saved_mb:.1f} MB ({summary["savings_percent"]:.1f}%)\n\n"
