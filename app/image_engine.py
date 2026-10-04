@@ -13,6 +13,11 @@ try:
 except ImportError:
     pass
 
+# Product photos can legitimately be very large. Keep a safety ceiling,
+# but raise Pillow's default so large source images can still be resized.
+MAX_SOURCE_PIXELS = 300_000_000
+Image.MAX_IMAGE_PIXELS = MAX_SOURCE_PIXELS
+
 SUPPORTED = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".avif", ".heic", ".heif", ".webp"}
 
 
@@ -94,9 +99,12 @@ def optimize_product_folder(product_dir: Path, quality: int, max_width: int, max
 
 
 def optimize_root(root: Path, quality: int, max_width: int, max_height: int, progress=None, log=print):
-    product_dirs = sorted([p for p in root.iterdir() if p.is_dir() and p.name.lower() != "optimized"],
-                          key=lambda p: p.name.lower())
+    product_dirs = sorted(
+        [p for p in root.iterdir() if p.is_dir() and p.name.lower() != "optimized"],
+        key=lambda p: p.name.lower(),
+    )
     all_rows = []
+
     for index, product_dir in enumerate(product_dirs, start=1):
         log(f"Processing product folder: {product_dir.name}")
         all_rows.extend(optimize_product_folder(product_dir, quality, max_width, max_height, log))
@@ -106,8 +114,10 @@ def optimize_root(root: Path, quality: int, max_width: int, max_height: int, pro
     report = root / "image-optimization-report.csv"
     with report.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.writer(f)
-        writer.writerow(["product_folder", "source_file", "output_file", "action",
-                         "original_size_bytes", "output_size_bytes", "status", "error"])
+        writer.writerow([
+            "product_folder", "source_file", "output_file", "action",
+            "original_size_bytes", "output_size_bytes", "status", "error"
+        ])
         writer.writerows(all_rows)
 
     return report, all_rows
