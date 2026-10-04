@@ -26,20 +26,23 @@ def safe_product_name(name: str) -> str:
     return value or "product"
 
 
-def unique_path(path: Path) -> Path:
-    if not path.exists():
-        return path
-    i = 2
-    while True:
-        candidate = path.with_name(f"{path.stem}-{i}{path.suffix}")
-        if not candidate.exists():
-            return candidate
-        i += 1
+def prepare_output_dir(product_dir: Path) -> Path:
+    output_dir = product_dir / "optimized"
+    output_dir.mkdir(exist_ok=True)
+
+    # The optimized folder is owned by this tool. Re-running optimization
+    # should rebuild it rather than create -2, -3, etc. copies.
+    for item in output_dir.iterdir():
+        if item.is_file() or item.is_symlink():
+            item.unlink()
+        elif item.is_dir():
+            shutil.rmtree(item)
+
+    return output_dir
 
 
 def optimize_product_folder(product_dir: Path, quality: int, max_width: int, max_height: int, log=print):
-    output_dir = product_dir / "optimized"
-    output_dir.mkdir(exist_ok=True)
+    output_dir = prepare_output_dir(product_dir)
 
     images = sorted(
         [p for p in product_dir.iterdir() if p.is_file()],
@@ -48,11 +51,13 @@ def optimize_product_folder(product_dir: Path, quality: int, max_width: int, max
 
     rows = []
     number = 1
+    product_name = safe_product_name(product_dir.name)
 
     for source in images:
         ext = source.suffix.lower()
+
         if ext == ".gif":
-            destination = unique_path(output_dir / f"{safe_product_name(product_dir.name)}{number}.gif")
+            destination = output_dir / f"{product_name}{number}.gif"
             try:
                 shutil.copy2(source, destination)
                 rows.append([product_dir.name, source.name, destination.name, "GIF unchanged",
@@ -67,9 +72,11 @@ def optimize_product_folder(product_dir: Path, quality: int, max_width: int, max
         if ext not in SUPPORTED:
             continue
 
-        destination = unique_path(output_dir / f"{safe_product_name(product_dir.name)}{number}.webp")
+        destination = output_dir / f"{product_name}{number}.webp"
+
         try:
             original_size = source.stat().st_size
+
             with Image.open(source) as image:
                 image = ImageOps.exif_transpose(image)
                 image.load()
@@ -86,10 +93,12 @@ def optimize_product_folder(product_dir: Path, quality: int, max_width: int, max
 
             output_size = destination.stat().st_size
             action = "WebP optimized" if ext == ".webp" else "Converted to WebP"
+
             rows.append([product_dir.name, source.name, destination.name, action,
                          original_size, output_size, "OK", ""])
             log(f"{action}: {source.name}")
             number += 1
+
         except Exception as exc:
             rows.append([product_dir.name, source.name, "", "Skipped",
                          source.stat().st_size if source.exists() else 0, 0, "FAILED", str(exc)])
@@ -108,10 +117,12 @@ def optimize_root(root: Path, quality: int, max_width: int, max_height: int, pro
     for index, product_dir in enumerate(product_dirs, start=1):
         log(f"Processing product folder: {product_dir.name}")
         all_rows.extend(optimize_product_folder(product_dir, quality, max_width, max_height, log))
+
         if progress:
             progress(index / max(1, len(product_dirs)))
 
     report = root / "image-optimization-report.csv"
+
     with report.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.writer(f)
         writer.writerow([
