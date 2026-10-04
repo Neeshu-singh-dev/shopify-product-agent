@@ -107,6 +107,29 @@ def optimize_product_folder(product_dir: Path, quality: int, max_width: int, max
     return rows
 
 
+def build_summary(rows):
+    images_found = len(rows)
+    converted = sum(1 for row in rows if row[3] == "Converted to WebP" and row[6] == "OK")
+    gif_unchanged = sum(1 for row in rows if row[3] == "GIF unchanged" and row[6] == "OK")
+    webp_optimized = sum(1 for row in rows if row[3] == "WebP optimized" and row[6] == "OK")
+    failed = sum(1 for row in rows if row[6] == "FAILED")
+    original_bytes = sum(int(row[4] or 0) for row in rows)
+    output_bytes = sum(int(row[5] or 0) for row in rows)
+    saved_bytes = max(0, original_bytes - output_bytes)
+    savings_percent = (saved_bytes / original_bytes * 100) if original_bytes else 0
+    return {
+        "images_found": images_found,
+        "converted": converted,
+        "gif_unchanged": gif_unchanged,
+        "webp_optimized": webp_optimized,
+        "failed": failed,
+        "original_bytes": original_bytes,
+        "output_bytes": output_bytes,
+        "saved_bytes": saved_bytes,
+        "savings_percent": savings_percent,
+    }
+
+
 def optimize_root(root: Path, quality: int, max_width: int, max_height: int, progress=None, log=print):
     product_dirs = sorted(
         [p for p in root.iterdir() if p.is_dir() and p.name.lower() != "optimized"],
@@ -131,4 +154,4 @@ def optimize_root(root: Path, quality: int, max_width: int, max_height: int, pro
         ])
         writer.writerows(all_rows)
 
-    return report, all_rows
+    return report, all_rows, build_summary(all_rows)
