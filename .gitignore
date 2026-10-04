@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+Input/
+Output/
+image-optimization-report.csv
