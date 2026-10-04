@@ -129,20 +129,33 @@ class App:
 
     def worker(self, root, quality, width, height):
         try:
-            report, rows = optimize_root(root, quality, width, height,
+            report, rows, summary = optimize_root(root, quality, width, height,
                                          progress=lambda value: self.root.after(0, lambda: self.progress.configure(value=value * 100)),
                                          log=self.write_log)
-            ok = sum(1 for row in rows if row[6] == "OK")
-            failed = sum(1 for row in rows if row[6] == "FAILED")
-            self.root.after(0, lambda: self.finish(report, ok, failed))
+            self.root.after(0, lambda: self.finish(report, summary))
         except Exception as exc:
             self.root.after(0, lambda: self.fail(exc))
 
-    def finish(self, report, ok, failed):
+    def finish(self, report, summary):
         self.button.config(state="normal")
         self.progress["value"] = 100
-        self.status.set(f"Complete — {ok} processed, {failed} failed")
-        messagebox.showinfo("Optimization complete", f"Finished.\n\nReport:\n{report}")
+        self.status.set(
+            f"Complete — {summary["images_found"]} found, {summary["failed"]} failed"
+        )
+        saved_mb = summary["saved_bytes"] / (1024 * 1024)
+        messagebox.showinfo(
+            "Optimization complete",
+            f"Finished.\n\n"
+            f"Images found: {summary["images_found"]}\n"
+            f"Converted: {summary["converted"]}\n"
+            f"GIF unchanged: {summary["gif_unchanged"]}\n"
+            f"WebP optimized: {summary["webp_optimized"]}\n"
+            f"Failed: {summary["failed"]}\n\n"
+            f"Original size: {summary["original_bytes"] / (1024 * 1024):.1f} MB\n"
+            f"Optimized size: {summary["output_bytes"] / (1024 * 1024):.1f} MB\n"
+            f"Space saved: {saved_mb:.1f} MB ({summary["savings_percent"]:.1f}%)\n\n"
+            f"Report:\n{report}"
+        )
 
     def fail(self, exc):
         self.button.config(state="normal")
