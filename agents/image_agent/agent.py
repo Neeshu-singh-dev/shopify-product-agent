@@ -14,7 +14,7 @@ SUPPORTED_ACTIONS = {
 
 def handle_image_task(*, action: str, prompt: str = "", input_path: str | Path | None = None,
                       output_path: str | Path | None = None, model: str | None = None,
-                      size: str = "1024x1024", quality: str = "high",
+                      size: str = "1024x1024", image_quality: str = "high",
                       background: str = "auto", output_format: str = "png",
                       **_: Any) -> AgentResult:
     """Manager-facing Image Agent backed by the OpenAI Images API."""
@@ -45,7 +45,7 @@ def handle_image_task(*, action: str, prompt: str = "", input_path: str | Path |
             output_path=output_path,
             model=model or "gpt-image-2.5-sunburst",
             size=size,
-            quality=quality,
+            quality=image_quality,
             background=background,
         )
     elif action == "edit_image":
@@ -65,7 +65,7 @@ def handle_image_task(*, action: str, prompt: str = "", input_path: str | Path |
             output_path=output_path,
             model=model or "gpt-image-2.5-sunburst",
             size=size if size != "1024x1024" else "auto",
-            quality=quality,
+            quality=image_quality,
             background=background,
             output_format=output_format,
         )
