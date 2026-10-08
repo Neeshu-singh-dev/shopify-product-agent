@@ -24,18 +24,24 @@ Reserved future boundary:
 
 ## Image Agent
 
-The Image Agent supports:
-- Generate an image from a prompt
-- Edit an existing image using a prompt
-- Remove an image background and return a transparent PNG
+The Image Agent is **local-first and API-free**. It does not require an OpenAI API key or any paid API.
 
-The Image Agent requires an OpenAI API key in the local environment:
+It currently supports:
+- Local text-to-image generation with Diffusers.
+- Local image-to-image editing.
+- Local background removal through the optional rembg stack.
+
+The default generation model is `runwayml/stable-diffusion-v1-5`. The provider is lazy-loaded, so the normal Product Agent does not load a large AI model.
+
+### Local AI installation
+
+The core project remains lightweight. Install the optional local stack only when you want creative Image Agent features:
 
 ```bat
-set OPENAI_API_KEY=your_api_key_here
+.venv\\Scripts\\python.exe -m pip install -r requirements-local.txt
 ```
 
-The key is read from the environment and is not stored in the repository.
+For an NVIDIA GPU, install a PyTorch build compatible with your installed NVIDIA driver/CUDA environment before running generation. The first model run downloads the selected model weights to the local machine.
 
 ### Image generation
 
@@ -43,10 +49,10 @@ The key is read from the environment and is not stored in the repository.
 .venv\\Scripts\\python.exe -m manager "Create a premium jewelry product image" --root "C:\\Products" --output "C:\\Products\\generated.png"
 ```
 
-Use `--prompt` when the image prompt should differ from the Manager request:
+Use `--prompt` for a more specific creative instruction:
 
 ```bat
-.venv\\Scripts\\python.exe -m manager "Create image" --root "C:\\Products" --prompt "A luxury gold ring on a clean ivory studio background" --output "C:\\Products\\ring.png"
+.venv\\Scripts\\python.exe -m manager "Create image" --root "C:\\Products" --prompt "A luxury gold ring on an ivory studio background, premium jewelry photography" --output "C:\\Products\\ring.png" --size 512x512
 ```
 
 ### Image editing
@@ -61,10 +67,11 @@ Use `--prompt` when the image prompt should differ from the Manager request:
 .venv\\Scripts\\python.exe -m manager "Remove background" --root "C:\\Products" --input "C:\\Products\\ring.png" --output "C:\\Products\\ring-transparent.png"
 ```
 
-Image-generation quality is controlled separately from Product Agent WebP quality:
-- `--image-quality` controls generated/edited image quality.
-- `--quality` controls Product Agent WebP compression quality.
+### Why local instead of an API?
 
+Jarvis is intentionally designed so the Image Agent does not depend on a paid cloud API. Local providers can be replaced or expanded later without changing the Manager contract. Large modern image models can require much more VRAM than a 6GB GPU, so the first local provider uses a lighter model and memory-saving CPU offload rather than assuming every model will fit.
+
+**Commercial-use note:** model weights have their own licenses. Before using a downloaded model for commercial Shopify/client work, verify that model's current license. We are not treating every open-source model as automatically commercial-safe.
 ## Manager CLI
 
 From the repository root:
@@ -91,6 +98,6 @@ python -m venv .venv
 .venv\\Scripts\\python.exe app\\main.py
 ```
 
-The V1 Product Agent remains usable without an API key. The Image Agent requires an OpenAI API key and internet access when its creative actions are invoked.
+The V1 Product Agent works without any API key. The local Image Agent does not require a paid API; internet is only needed when downloading model packages/weights for the first time, unless the required models are already cached locally.
 
 The final portable Windows EXE will be built separately and should be tested on a PC without Python before release.
