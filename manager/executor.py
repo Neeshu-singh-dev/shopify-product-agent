@@ -16,6 +16,13 @@ class Executor:
         try:
             value = spec.handler(action=action, **kwargs)
             if isinstance(value, AgentResult):
+                # The Executor owns workflow identity, so every specialist
+                # result gets the same task ID even when the specialist did
+                # not create one itself.
+                if not value.task_id:
+                    value.task_id = task_id
+                if not value.agent:
+                    value.agent = agent_name
                 return value
             return AgentResult(
                 agent=agent_name,
