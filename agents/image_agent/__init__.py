@@ -1,6 +1,3 @@
-"""Image Agent interface placeholder.
+from .agent import handle_image_task
 
-Creative image generation/editing will be connected here later. The Manager
-can reserve this specialist boundary without installing a heavy local image
-backend yet.
-"""
+__all__ = ["handle_image_task"]
