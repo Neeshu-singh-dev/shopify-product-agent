@@ -41,9 +41,15 @@ class Manager:
 
 def create_default_manager() -> Manager:
     """Create a Manager with the current V1 Product Agent registered."""
+    from agents.image_agent.agent import handle_image_task
     from agents.product_agent.agent import handle_product_task
 
     manager = Manager()
+    manager.register_agent(
+        "image_agent",
+        "Creative image generation, editing, and background-removal workflows.",
+        handle_image_task,
+    )
     manager.register_agent(
         "product_agent",
         "Product images and product-data preparation, including the V1 image optimizer.",
