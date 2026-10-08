@@ -63,6 +63,7 @@ def test_executor_assigns_task_id_to_specialist_result():
 
     assert results[0].task_id
 
+
 def test_manager_runs_real_product_image_optimization(tmp_path: Path):
     from PIL import Image
 
@@ -97,4 +98,3 @@ def test_manager_runs_real_product_image_optimization(tmp_path: Path):
     assert (optimized / "demo-product2.webp").exists()
     assert (optimized / "demo-product3.gif").exists()
     assert (tmp_path / "image-optimization-report.csv").exists()
-\n
