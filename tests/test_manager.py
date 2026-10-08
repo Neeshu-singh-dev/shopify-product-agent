@@ -31,3 +31,11 @@ def test_manager_reports_unrecognized_request():
     manager = Manager()
     results = manager.handle("Tell me something unrelated")
     assert results[0].status == "needs_input"
+
+
+def test_planner_preserves_combined_image_and_csv_workflow():
+    plan = Planner().plan("Create product images and prepare the CSV")
+    assert [(step.agent, step.action) for step in plan] == [
+        ("image_agent", "creative_image_work"),
+        ("product_agent", "prepare_product_assets"),
+    ]
