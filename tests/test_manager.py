@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from manager.manager import Manager
+from manager.manager import Manager, create_default_manager
 from manager.planner import Planner
 
 
@@ -42,7 +42,7 @@ def test_planner_preserves_combined_image_and_csv_workflow():
 
 
 def test_manager_routes_generate_image_to_image_agent():
-    manager = __import__("manager.manager", fromlist=["create_default_manager"]).create_default_manager()
+    manager = create_default_manager()
     results = manager.handle("Create image for this product")
 
     assert len(results) == 1
