@@ -1,1 +1,10 @@
-# Optional local AI dependencies for the local Image Agent.
+# Optional local AI stack. Core Jarvis/Product Agent does not require these packages.
+# Install a CUDA-compatible PyTorch build for your NVIDIA driver before first local generation.
+torch>=2.0
+torchvision>=0.15
+diffusers>=0.30
+transformers>=4.45
+accelerate>=0.34
+safetensors>=0.4
+rembg>=2.0
+onnxruntime>=1.18
