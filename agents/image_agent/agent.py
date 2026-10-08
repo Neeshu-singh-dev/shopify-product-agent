@@ -24,9 +24,9 @@ def handle_image_task(*, action: str, prompt: str = "", input_path: str | Path |
             errors=["Only the local provider is currently supported."],
         )
 
-    from .providers.local_provider import LocalImageProvider
+    from .providers.local_provider import DEFAULT_GENERATION_MODEL, LocalImageProvider
 
-    local = LocalImageProvider(model_id=model or LocalImageProvider.__init__.__defaults__[0])
+    local = LocalImageProvider(model_id=model or DEFAULT_GENERATION_MODEL)
     if action == "generate_image":
         if not prompt.strip() or not output_path:
             return AgentResult(
