@@ -51,6 +51,17 @@ def test_manager_routes_generate_image_to_image_agent():
     assert results[0].task_id
 
 
+def test_image_agent_reports_missing_generation_inputs():
+    manager = create_default_manager()
+    results = manager.handle(
+        "Create image for this product",
+        root="unused",
+    )
+
+    assert results[0].status == "needs_input"
+    assert "prompt" in results[0].errors[0].lower()
+
+
 def test_executor_assigns_task_id_to_specialist_result():
     manager = Manager()
 

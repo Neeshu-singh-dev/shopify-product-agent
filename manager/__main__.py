@@ -10,7 +10,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Jarvis Shopify Multi-Agent Manager")
     parser.add_argument("request", help="Natural-language task for Jarvis")
     parser.add_argument("--root", required=True, help="Product root folder")
-    parser.add_argument("--quality", type=int, default=88)
+    parser.add_argument("--prompt", help="Image generation/edit prompt")
+    parser.add_argument("--input", dest="input_path", help="Input image for editing/background removal")
+    parser.add_argument("--output", dest="output_path", help="Output image path")
+    parser.add_argument("--model", default="gpt-image-2.5-sunburst")
+    parser.add_argument("--size", default="1024x1024")
+    parser.add_argument("--image-quality", default="high", choices=["low", "medium", "high", "xhigh", "max"])
+    parser.add_argument("--background", default="auto", choices=["auto", "opaque", "transparent"])
+    parser.add_argument("--output-format", default="png", choices=["png", "jpeg", "webp"])
+    parser.add_argument("--quality", type=int, default=88, help="Product image WebP quality")
     parser.add_argument("--max-width", type=int, default=2000)
     parser.add_argument("--max-height", type=int, default=2000)
     args = parser.parse_args()
@@ -19,6 +27,14 @@ def main() -> None:
     results = manager.handle(
         args.request,
         root=args.root,
+        prompt=args.prompt or args.request,
+        input_path=args.input_path,
+        output_path=args.output_path,
+        model=args.model,
+        size=args.size,
+        image_quality=args.image_quality,
+        background=args.background,
+        output_format=args.output_format,
         quality=args.quality,
         max_width=args.max_width,
         max_height=args.max_height,
