@@ -1,0 +1,1 @@
+# Optional local AI dependencies for the local Image Agent.
