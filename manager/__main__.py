@@ -18,7 +18,7 @@ def main() -> None:
     parser.add_argument("--image-quality", default="high", choices=["low", "medium", "high", "xhigh", "max"])
     parser.add_argument("--background", default="auto", choices=["auto", "opaque", "transparent"])
     parser.add_argument("--output-format", default="png", choices=["png", "jpeg", "webp"])
-    parser.add_argument("--quality", type=int, default=88)
+    parser.add_argument("--quality", type=int, default=88, help="Product image WebP quality")
     parser.add_argument("--max-width", type=int, default=2000)
     parser.add_argument("--max-height", type=int, default=2000)
     args = parser.parse_args()
@@ -32,10 +32,10 @@ def main() -> None:
         output_path=args.output_path,
         model=args.model,
         size=args.size,
-        quality=args.image_quality,
+        image_quality=args.image_quality,
         background=args.background,
         output_format=args.output_format,
-        image_quality=args.image_quality,
+        quality=args.quality,
         max_width=args.max_width,
         max_height=args.max_height,
     )
